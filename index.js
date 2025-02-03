@@ -1,52 +1,37 @@
-// express
-
-const express = require('express');
+import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import corsPassThru from './cors.js';
 
 const app = express();
 const port = process.env.WS3KP_PORT ?? 8083;
-const path = require('path');
+const __dirname = path.resolve();
+const { version } = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
-// template engine
 app.set('view engine', 'ejs');
 
-// cors pass through
-const fs = require('fs');
-const corsPassThru = require('./cors');
-
-// cors pass-thru to api.weather.gov
+// CORS handling for stations
 app.get('/stations/*', corsPassThru);
 
-// version
-const { version } = JSON.parse(fs.readFileSync('package.json'));
-
-const index = (req, res) => {
-	res.render(path.join(__dirname, 'views/index'), {
-		production: false,
-		version,
-	});
-};
-
-// debugging
+// Serve static files efficiently
 if (process.env?.DIST === '1') {
-	// distribution
-	app.use('/images', express.static(path.join(__dirname, './server/images')));
-	app.use('/fonts', express.static(path.join(__dirname, './server/fonts')));
-	app.use('/scripts', express.static(path.join(__dirname, './server/scripts')));
-	app.use('/', express.static(path.join(__dirname, './dist')));
+    app.use(express.static(path.join(__dirname, './dist')));
 } else {
-	// debugging
-	app.get('/index.html', index);
-	app.get('/', index);
-	app.get('*', express.static(path.join(__dirname, './server')));
+    app.get(['/', '/index.html'], (req, res) => 
+        res.render('views/index', { production: false, version })
+    );
+    app.use(express.static(path.join(__dirname, './server')));
 }
 
-const server = app.listen(port, () => {
-	console.log(`Server listening on port ${port}`);
-});
+const server = app.listen(port, () => 
+    console.log(`🚀 Server running on http://localhost:${port}`)
+);
 
-// graceful shutdown
+// Graceful shutdown handling
 process.on('SIGINT', () => {
-	server.close(() => {
-		console.log('Server closed');
-	});
+    console.log('Shutting down server...');
+    server.close(() => {
+        console.log('✅ Server successfully closed');
+        process.exit(0);
+    });
 });

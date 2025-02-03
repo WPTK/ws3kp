@@ -1,18 +1,9 @@
-// *********************************** unit conversions ***********************
+export const round2 = (val, dec) => Math.round(val * 10 ** dec) / 10 ** dec;
 
-const round2 = (value, decimals) => Math.trunc(value * 10 ** decimals) / 10 ** decimals;
+const KM_TO_MILES = 1.60934, FT_TO_METERS = 0.3048, PASCAL_TO_INHG = 0.0002953;
 
-const kphToMph = (Kph) => Math.round(Kph / 1.609_34);
-const celsiusToFahrenheit = (Celsius) => Math.round((Celsius * 9) / 5 + 32);
-const kilometersToMiles = (Kilometers) => Math.round(Kilometers / 1.609_34);
-const metersToFeet = (Meters) => Math.round(Meters / 0.3048);
-const pascalToInHg = (Pascal) => round2(Pascal * 0.000_295_3, 2);
-
-export {
-	kphToMph,
-	celsiusToFahrenheit,
-	kilometersToMiles,
-	metersToFeet,
-	pascalToInHg,
-	round2,
-};
+export const kphToMph = (kph) => Math.round(kph / KM_TO_MILES);
+export const celsiusToFahrenheit = (c) => Math.round((c * 9) / 5 + 32);
+export const kilometersToMiles = (km) => Math.round(km / KM_TO_MILES);
+export const metersToFeet = (m) => Math.round(m / FT_TO_METERS);
+export const pascalToInHg = (p) => round2(p * PASCAL_TO_INHG, 2);
